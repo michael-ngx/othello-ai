@@ -26,9 +26,52 @@ def compute_utility(board, color):
         return 0
 
 # Better heuristic value of board
-def compute_heuristic(board, color): #not implemented, optional
-    #IMPLEMENT
-    return 0 #change this!
+# The implementation of this heuristic is based on the following website: 
+# https://kartikkukreja.wordpress.com/2013/03/30/heuristic-function-for-reversiothello/
+def compute_heuristic(board, color):
+    n = len(board)
+    
+    # Coin parity
+    # Difference in the number of current scores
+    dark_score, light_score = get_score(board)
+    coin_parity = dark_score - light_score
+    
+    # Stability
+    # Placements are classified into 3 categories: stable, semi-stable, and unstable
+    # Stable: A disc that cannot be flipped (corners are always stable)
+    # Semi-stable: A disc that can be flipped, but will not be flipped in the next move
+    # Unstable: A disc that can be flipped in the next move
+    dark_stable = 0
+    light_stable = 0
+    for i in range(n):
+        for j in range(n):
+            # Corners are always stable
+            if [i, j] in [[0, 0], [0, n-1], [n-1, 0], [n-1, n-1]]:
+                if board[i][j] == 1:
+                    dark_stable += 5
+                elif board[i][j] == 2:
+                    light_stable += 5
+            # Edges are semi-stable
+            elif i == 0 or i == n-1 or j == 0 or j == n-1:
+                if board[i][j] == 1:
+                    dark_stable += 2
+                elif board[i][j] == 2:
+                    light_stable += 2
+            # Other placements are considered unstable
+            else:
+                if board[i][j] == 1:
+                    dark_stable += 1
+                elif board[i][j] == 2:
+                    light_stable += 1
+    stable = dark_stable - light_stable
+    
+    # Weighted sum of the four components
+    utility = 0.3 * coin_parity + 0.7 * stable
+    
+    if color == 1:
+        return utility
+    elif color == 2:
+        return -utility
 
 ############ MINIMAX ###############################
 def minimax_min_node(board, color, limit, caching = 0):
