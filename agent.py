@@ -32,6 +32,10 @@ def compute_heuristic(board, color): #not implemented, optional
 
 ############ MINIMAX ###############################
 def minimax_min_node(board, color, limit, caching = 0):
+    
+    if caching == 1 and (board, color) in cached_states:
+        return cached_states[(board, color)]
+        
     possible_moves = get_possible_moves(board, color)
     if not possible_moves or limit == 0:
         return (None, compute_utility(board, color))
@@ -42,10 +46,17 @@ def minimax_min_node(board, color, limit, caching = 0):
         _, utility = minimax_max_node(new_board, 3-color, limit-1, caching)
         if not best_move or utility < best_utility:
             best_move, best_utility = move, utility
-            
+    
+    if caching == 1:
+        cached_states[(board, color)] = (best_move, best_utility)
+               
     return best_move, best_utility
 
 def minimax_max_node(board, color, limit, caching = 0): #returns highest possible utility
+    
+    if caching == 1 and (board, color) in cached_states:
+        return cached_states[(board, color)]
+    
     possible_moves = get_possible_moves(board, color)
     if not possible_moves or limit == 0:
         return (None, compute_utility(board, color))
@@ -56,7 +67,10 @@ def minimax_max_node(board, color, limit, caching = 0): #returns highest possibl
         _, utility = minimax_min_node(new_board, 3-color, limit-1, caching)
         if not best_move or utility > best_utility:
             best_move, best_utility = move, utility
-            
+    
+    if caching == 1:
+        cached_states[(board, color)] = (best_move, best_utility)
+    
     return best_move, best_utility
     
 def select_move_minimax(board, color, limit, caching = 0):
@@ -77,6 +91,10 @@ def select_move_minimax(board, color, limit, caching = 0):
 
 ############ ALPHA-BETA PRUNING #####################
 def alphabeta_min_node(board, color, alpha, beta, limit, caching = 0, ordering = 0):
+    
+    if caching == 1 and (board, color, alpha, beta) in cached_states:
+        return cached_states[(board, color, alpha, beta)]
+    
     possible_moves = get_possible_moves(board, color)
     if not possible_moves or limit == 0:
         return (None, compute_utility(board, color))
@@ -92,10 +110,17 @@ def alphabeta_min_node(board, color, alpha, beta, limit, caching = 0, ordering =
             beta = best_utility
             if beta <= alpha:
                 break
-
+                
+    if caching == 1:
+        cached_states[(board, color, alpha, beta)] = (best_move, best_utility)
+        
     return best_move, best_utility
 
 def alphabeta_max_node(board, color, alpha, beta, limit, caching = 0, ordering = 0):
+    
+    if caching == 1 and (board, color, alpha, beta) in cached_states:
+        return cached_states[(board, color, alpha, beta)]
+    
     possible_moves = get_possible_moves(board, color)
     if not possible_moves or limit == 0:
         return (None, compute_utility(board, color))
@@ -111,7 +136,10 @@ def alphabeta_max_node(board, color, alpha, beta, limit, caching = 0, ordering =
             alpha = best_utility
             if beta <= alpha:
                 break
-            
+    
+    if caching == 1:
+        cached_states[(board, color, alpha, beta)] = (best_move, best_utility)
+         
     return best_move, best_utility
 
 def select_move_alphabeta(board, color, limit, caching = 0, ordering = 0):
